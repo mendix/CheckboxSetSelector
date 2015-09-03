@@ -7,117 +7,57 @@ require([
     'dojo/_base/array', 'dojo/dom-construct', 'dojo/text!CheckboxSelector/widget/template/CheckboxSelector.html', 'dojo/NodeList-traverse'
 ], function (declare, _WidgetBase, _TemplatedMixin, domMx, dom, domQuery, domProp, domGeom, domClass, domStyle, on, lang, text, array, domConstruct, widgetTemplate) {
 	'use strict';
-	// Declare widget's prototype.
+	
 	return declare('CheckboxSelector.widget.checkboxselector', [_WidgetBase, _TemplatedMixin], {
-		// _TemplatedMixin will create our dom node using this HTML template.
 		templateString: widgetTemplate,
-		// General variables
-		_wgtNode: null,
+
 		_contextObj: null,
 		_handles: null,
-
-		// Extra variables
 		_selectAllBox: null,
-		_readonly: null,
+		_readonly: false,
 		_firstTh: null,
-		_referencePath : null,
+		_referencePath: null,
 
-		/**
-		 * Mendix Widget methods.
-		 * ======================
-		 */
-		constructor: function () {
-			this._handles = [];
-			this._readonly = false;
-		},
-
-		// PostCreate is fired after the properties of the widget are set.
 		postCreate: function () {
-
-			// Setup widgets
+			this._handles = [];
+			
 			this._setupWidget();
 		},
 
-		/**
-		 * What to do when data is loaded?
-		 */
-
 		update: function (obj, callback) {
-			// update
-			console.debug('CheckboxSelector - update');
-
 			this._contextObj = obj;
 
 			if (this._contextObj === null) {
-
-				// Sorry no data no show!
+				// No data no show
 				domStyle.set(this.domNode, "visibility", "hidden");
-				console.debug('CheckboxSelector  - update - We did not get any context object!');
 			} else {
 				domStyle.set(this.domNode, "visibility", "visible");
-				
 				this._readonly = this._contextObj.isReadonlyAttr(this._referencePath);
 
 				// Subscribe to object updates.
 				this._resetSubscriptions();
 
-				// Load data
 				this._loadData();
 			}
 
 			callback();
-
 		},
 
-		/**
-		 * How the widget re-acts from actions invoked by the Mendix App.
-		 */
-		suspend: function () {
-			//TODO, what will happen if the widget is suspended (not visible).
-		},
-
-		resume: function () {
-			//TODO, what will happen if the widget is resumed (set visible).
-		},
-
-		enable: function () {
-			//TODO, what will happen if the widget is enabled (not visible).
-		},
-
-		disable: function () {
-			//TODO, what will happen if the widget is disabled (set visible).
-		},
-
-		unintialize: function () {},
-
-
-		/**
-		 * Extra setup widget methods.
-		 * ======================
-		 */
 		_setupWidget: function () {
-			console.debug('CheckboxSelector - setup widget');
-
-			// To be able to just alter one variable in the future we set an internal variable with the domNode that this widget uses.
-			this._wgtNode = this.domNode;
-			
 			this._referencePath = this.reference.split('/')[0];
-			this._firstTh = domQuery('.first-th', this._wgtNode)[0];
+			this._firstTh = domQuery('.first-th', this.domNode)[0];
 
 			if (this.addSelectAll) {
-				console.debug('addSelectAll');
 				this._selectAllBox = domConstruct.create('input', {
 					type: 'checkbox'
 				});
-
-				console.debug(this._selectAllBox);
 
 				domConstruct.place(this._selectAllBox, this._firstTh);
 				
 				//Add the onclick event on the SelectAll checkbox
 				on(this._selectAllBox, 'click', lang.hitch(this, function (event) {
 
-					var tbody = domQuery('tbody', this._wgtNode)[0];
+					var tbody = domQuery('tbody', this.domNode)[0];
 					//toggle all checkboxes when the row is clicked
 					this._selectAllBoxes(domQuery('input', tbody));
 				}));
@@ -127,10 +67,8 @@ require([
 
 		// Attach events to newly created nodes.
 		_setupEvents: function () {
-
-			console.debug('CheckboxSelector - setup events');
 			if (!this.readOnly && !this._readonly) {
-				on(domQuery('tbody tr', this._wgtNode), 'click', lang.hitch(this, function (event) {
+				on(domQuery('tbody tr', this.domNode), 'click', lang.hitch(this, function (event) {
 					if (event.target.tagName.toUpperCase() === 'INPUT') {
 						
 						//Evaluate if the value of the select all box needs to change
@@ -145,11 +83,8 @@ require([
 					}
 				}));
 			} else {
-				//disable all checkboxes
 				this._setDisabled(domQuery('input', this.domNode));
-
 			}
-
 		},
 
 
@@ -158,7 +93,6 @@ require([
 		 * ======================
 		 */
 		_loadData: function () {
-			console.debug('CheckboxSelector - Load data');
 			this._clearValidations();
 
 			//default fetch
@@ -180,17 +114,14 @@ require([
 					this._fetchData(objs);
 				})
 			});
-
 		},
 
 		_setAsReference: function (guid) {
-			console.debug('CheckboxSelector - set as reference');
 			this._contextObj.addReferences(this._referencePath, [guid]);
 		},
 
 		_execMf: function (mf, guids) {
 			if (mf && guids) {
-				console.debug('CheckboxSelector - Execute MF with guids: ', guids);
 				mx.data.action({
 					params: {
 						applyto: 'selection',
@@ -212,17 +143,13 @@ require([
 		 * ======================
 		 */
 		_buildTemplate: function (rows, headers) {
-			//TODO: Load template for each object
-			console.debug('CheckboxSelector - Build Template');
+			var tbody = domQuery('tbody', this.domNode)[0],
+				thead = domQuery('thead tr', this.domNode)[0];
 
-			var tbody = domQuery('tbody', this._wgtNode)[0],
-				thead = domQuery('thead tr', this._wgtNode)[0];
-			//empty the table
 			domConstruct.empty(tbody);
-
 			domConstruct.place(this._firstTh, thead, 'first');
 
-			for( var i = 0; i<headers.length;i++ ) {
+			for( var i = 0; i<headers.length; i++ ) {
 				var headerPos=i+1;
 				if( thead.children.length > headerPos ) 
 					thead.children[headerPos].innerHTML = headers[i];
@@ -231,11 +158,10 @@ require([
 						innerHTML: headers[i]
 					});
 					domConstruct.place(th, thead, 'last');
-				} 
+				}
 			}
 
 			array.forEach(rows, lang.hitch(this, function (rowData) {
-
 				var row = domConstruct.create('tr', {
 						id: this.domNode.id + '_' + rowData.id
 					}),
@@ -259,15 +185,12 @@ require([
 
 			this._setReferencedBoxes(this._contextObj.getReferences(this.reference.split('/')[0]));
 
-			// Setup events
 			this._setupEvents();
 		},
 
 		_fetchData: function (objs) {
 			var data = [],
 				finalLength = objs.length * this.displayAttrs.length;
-
-			console.debug('CheckboxSelector - fetched data');
 
 			array.forEach(objs, lang.hitch(this, function (obj) {
 				array.forEach(this.displayAttrs, lang.hitch(this, function (attr, index) {
@@ -334,7 +257,6 @@ require([
 		 * ======================
 		 */
 		_toggleCheckboxes: function (boxes) {
-
 			array.forEach(boxes, lang.hitch(this, function(node) { 
 				this._toggleCheckbox(node);
 			}));
@@ -369,8 +291,6 @@ require([
 		},
 
 		_selectAllBoxes: function (boxes) {
-			console.debug('CheckboxSelector - (De)select all checkboxes');
-			
 			array.forEach(boxes, lang.hitch(this, function (box) {
 				if (this._selectAllBox.checked) {
 					box.checked = true;
@@ -382,12 +302,6 @@ require([
 		},
 
 		_setReferences: function (boxes) {
-			console.debug('CheckboxSelector - set references');
-			var self = this,
-				refguids = this._contextObj.getReferences(this.reference.split('/')[0]),
-				id = null;
-
-			
 			boxes.forEach( lang.hitch(this, function (box) {
 				this._setReference(box);
 			}));
@@ -410,9 +324,6 @@ require([
 		 */
 
 		_setReferencedBoxes: function (guids) {
-			
-			var boxes = [];
-			
 			var inputNodes = domQuery('input[value]', this.domNode);
 			
 			array.forEach(inputNodes, lang.hitch(this, function(inputNode) {
@@ -538,7 +449,6 @@ require([
 			});
 
 			this.domNode.appendChild(this._alertdiv);
-
 		}
 	});
 });
