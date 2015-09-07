@@ -28,6 +28,8 @@ Showing multiple attributes of the objects for the Reference Set.
 Insert the widget into your dataview and set the properties.
  
 ## Properties
+
+### Checkbox Set Selector
  
 - Appearance
   - Use headers: Boolean to enable/disable the headers.
@@ -50,3 +52,10 @@ Add 'Select All' checkbox: If true, a checkbox will be added in the header row t
   - Sort order: The order the list should be sorted in.
   - XPath Constraint: An XPath constraint on the possible objects that are shown. Do note that a reference set can contain objects not shown because of this constraint if set elsewhere.
   - Limit: A limit to the number of objects shown to prevent the widget from becoming too large. Leave on 0 for unlimited.
+
+### Checkbox Set Selector (Microflow)
+
+This widget is similar to the normal Checkbox Set Selector, but it uses a microflow to retrieve the events.
+
+- Data source
+	- Data source microflow: The microflow that received the Dataview object and should return a list of objects that match with the entity selected for the 'Association'.
