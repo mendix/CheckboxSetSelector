@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="CheckboxSelector.widget.checkboxselectormf" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/">
+    <name>Checkbox Set Selector (Microflow)</name>
+    <description>Lets you use a list of objects with checkboxes as reference set selector.</description>
+    <icon>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAuklEQVR42qWScQfF IBTF27dNzIxMxtREkpjE7Nu+98q7U+96T0/nj3Vv55wfsYF0akgfpdTj3+KrM1QA KWVzed93DNi2rRmgtcaAdV1/lowxBDJpRgAhxNeytTafkEk7AizLkk3nHIEZdlCZ QQDOeTa99/lMO8ywg9I9AszznM3jONATwAOlDAJM03QHQgj3XN6XPgKM41iFYozk 8670EIAx1vgXEHKeJwZQSpsB13VhQHP7rQrQo27AE+MRcBFOD9LhAAAAAElFTkSu QmCC
+    </icon>
+    <properties>
+        <property key="reference" type="entity" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+            <caption>Association</caption>
+            <category>Data source</category>
+            <description>The reference entity.</description>
+        </property>
+		<property key="datasourcemf" type="microflow" required="true">
+			<caption>Data source microflow</caption>
+			<category>Data source</category>
+			<description></description>
+			<returnType type="Void"/>
+		</property>
+        <property key="readOnly" type="boolean" defaultValue="false">
+            <caption>Read only</caption>
+            <category>Appearance</category>
+            <description>Setting to set the widget to read only.</description>
+        </property>
+        <property key="displayAttrs" type="object" isList="true" required="false">
+            <caption>Display attributes</caption>
+            <category>Appearance</category>
+            <description>The object order equals the display order.</description>
+            <properties>
+                <property key="header" type="string">
+                    <caption>Header text</caption>
+                    <category>Data source</category>
+                    <description>The header for the column.</description>
+                </property>
+                <property key="displayAttr" type="attribute" isPath="optional" pathType="reference" entityProperty="../reference">
+                    <caption>Attribute</caption>
+                    <category>Data source</category>
+                    <description>The attribute to display.</description>
+                    <attributeTypes>
+                        <attributeType name="String" />
+                        <attributeType name="Integer" />
+                        <attributeType name="Currency" />
+                        <attributeType name="Enum" />
+                    </attributeTypes>
+                </property>
+                <property key="displayWidth" type="integer" defaultValue="45">
+                    <caption>Width %</caption>
+                    <category>Appearance</category>
+                    <description>The width of the table column</description>
+                </property>
+                <property key="decimalPrecision" type="integer" defaultValue="2">
+                    <caption>Decimal precision</caption>
+                    <category>Currency only</category>
+                    <description>Decimal precision of the attribute, defaults to 2</description>
+                </property>
+                <property key="currency" type="enumeration" defaultValue="None">
+                    <caption>Currency type</caption>
+                    <category>Currency only</category>
+                    <description>The currency type to show.</description>
+                    <enumerationValues>
+                        <enumerationValue key="None">None</enumerationValue>
+                        <enumerationValue key="Euro">Euro</enumerationValue>
+                        <enumerationValue key="Dollar">Dollar</enumerationValue>
+                        <enumerationValue key="Pound">Pound</enumerationValue>
+                        <enumerationValue key="Yen">Yen</enumerationValue>
+                    </enumerationValues>
+                </property>
+                <!--property key="useSeparators" type="boolean" defaultValue="false">
+                    <caption>Group separators</caption>
+                    <category>Currency only</category>
+                    <description>Use group separators.</description>
+                </property-->
+            </properties>
+        </property>
+        <property key="addSelectAll" type="boolean" defaultValue="false">
+            <caption>Select all</caption>
+            <category>Behavior</category>
+            <description>Add a "select all" checkbox to the header row.</description>
+        </property>
+        <property key="onChangeMf" type="microflow" required="false">
+            <caption>On change microflow</caption>
+            <category>Behavior</category>
+            <description>Microflow to trigger on change.</description>
+            <returnType type="Void" />
+        </property>
+    </properties>
+</widget>
+

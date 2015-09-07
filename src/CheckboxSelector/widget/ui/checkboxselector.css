@@ -4,3 +4,7 @@
  * Author: ...
  * Description: ... 
  */
+
+.wgt-CheckboxSetSelector > tr {
+	cursor : pointer;
+}

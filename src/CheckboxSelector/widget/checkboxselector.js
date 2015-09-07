@@ -1,14 +1,14 @@
 /*jslint nomen: true */
 /*global mx, mxui, mendix, dojo, require, console, define, module */
 
-require([
+define([
     'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
     'mxui/dom', 'dojo/dom', 'dojo/query', 'dojo/dom-prop', 'dojo/dom-geometry', 'dojo/dom-class', 'dojo/dom-style', 'dojo/on', 'dojo/_base/lang', 'dojo/text',
     'dojo/_base/array', 'dojo/dom-construct', 'dojo/text!CheckboxSelector/widget/template/CheckboxSelector.html', 'dojo/NodeList-traverse'
 ], function (declare, _WidgetBase, _TemplatedMixin, domMx, dom, domQuery, domProp, domGeom, domClass, domStyle, on, lang, text, array, domConstruct, widgetTemplate) {
 	'use strict';
 	
-	return declare('CheckboxSelector.widget.checkboxselector', [_WidgetBase, _TemplatedMixin], {
+	var flap = declare('CheckboxSelector.widget.checkboxselector', [_WidgetBase, _TemplatedMixin], {
 		templateString: widgetTemplate,
 
 		_contextObj: null,
@@ -75,7 +75,7 @@ require([
 						this._evaluateSelectAllBox( event.target );
 						
 						this._setReference(event.target);
-						this._execMf(this.onChangeMf, [this._contextObj.getGuid()]);
+						this._execMf(this.onChangeMf, this._contextObj.getGuid());
 					} else {
 						var row = domQuery(event.target).parent()[0];
 						//toggle the checkbox when the row is clicked
@@ -120,15 +120,18 @@ require([
 			this._contextObj.addReferences(this._referencePath, [guid]);
 		},
 
-		_execMf: function (mf, guids) {
-			if (mf && guids) {
+		_execMf: function (mf, guid, cb) {
+			if (mf && guid) {
 				mx.data.action({
 					params: {
 						applyto: 'selection',
 						actionname: mf,
-						guids: guids
+						guids: [guid]
 					},
-					callback: lang.hitch(this, function (obj) {
+					callback: lang.hitch(this, function (objs) {
+						if (cb != null) {
+							cb(objs);
+						}
 						//TODO what to do when all is ok!
 					}),
 					error: function (error) {
@@ -149,11 +152,12 @@ require([
 			domConstruct.empty(tbody);
 			domConstruct.place(this._firstTh, thead, 'first');
 
-			for( var i = 0; i<headers.length; i++ ) {
-				var headerPos=i+1;
-				if( thead.children.length > headerPos ) 
+			for (var i = 0; i < headers.length; i++) {
+				var headerPos = i + 1;
+				
+				if (thead.children.length > headerPos) {
 					thead.children[headerPos].innerHTML = headers[i];
-				else {
+				} else {
 					var th = domConstruct.create('th', {
 						innerHTML: headers[i]
 					});
@@ -180,7 +184,8 @@ require([
 					});
 					domConstruct.place(td, row, 'last');
 				});
-				domConstruct.place(row, tbody);
+				domConstruct.place(row, tbody)
+				
 			}));
 
 			this._setReferencedBoxes(this._contextObj.getReferences(this.reference.split('/')[0]));
@@ -306,7 +311,7 @@ require([
 				this._setReference(box);
 			}));
 
-			this._execMf(this.onChangeMf, [this._contextObj.getGuid()]);
+			this._execMf(this.onChangeMf, this._contextObj.getGuid());
 		},
 		
 		_setReference : function (box) {
@@ -451,4 +456,6 @@ require([
 			this.domNode.appendChild(this._alertdiv);
 		}
 	});
+	
+	return flap;
 });
