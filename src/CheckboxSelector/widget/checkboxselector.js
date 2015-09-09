@@ -8,7 +8,7 @@ define([
 ], function (declare, _WidgetBase, _TemplatedMixin, domMx, dom, domQuery, domProp, domGeom, domClass, domStyle, on, lang, text, array, domConstruct, widgetTemplate) {
 	'use strict';
 	
-	var flap = declare('CheckboxSelector.widget.checkboxselector', [_WidgetBase, _TemplatedMixin], {
+	var _checkbox = declare('CheckboxSelector.widget.checkboxselector', [_WidgetBase, _TemplatedMixin], {
 		templateString: widgetTemplate,
 
 		_contextObj: null,
@@ -457,5 +457,5 @@ define([
 		}
 	});
 	
-	return flap;
+	return _checkbox;
 });
