@@ -105,7 +105,7 @@ define([
 				filters.amount = this.limit;
 			}
 			if (this.constraint) {
-				xpath = '//' + refEntity + this.constraint.replace(/[%CurrentObject%]/g, this._contextObj);
+				xpath = '//' + refEntity + this.constraint.replace(/\[%CurrentObject%\]/g, this._contextObj.getGuid());
 			}
 			mx.data.get({
 				xpath: xpath,
