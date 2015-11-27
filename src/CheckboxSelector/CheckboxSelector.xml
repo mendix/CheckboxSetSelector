@@ -52,7 +52,7 @@
             <category>Appearance</category>
             <description>The object order equals the display order.</description>
             <properties>
-                <property key="header" type="string">
+                <property key="header" type="translatableString">
                     <caption>Header text</caption>
                     <category>Data source</category>
                     <description>The header for the column.</description>
