@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://www.mendix.com/package/1.0/">
-	<clientModule name="CheckboxSelector" version="6.4.1" xmlns="http://www.mendix.com/clientModule/1.0/">
-		<widgetFiles>
-			<widgetFile path="CheckboxSelector/CheckboxSelector.xml"/>
-			<widgetFile path="CheckboxSelector/CheckboxSelectorMf.xml"/>
-		</widgetFiles>
-		<files>
-			<file path="CheckboxSelector/widget/"/>
-		</files>
-	</clientModule>
+    <clientModule name="CheckboxSelector" version="6.7.0" xmlns="http://www.mendix.com/clientModule/1.0/">
+        <widgetFiles>
+            <widgetFile path="CheckboxSelector/CheckboxSelector.xml"/>
+            <widgetFile path="CheckboxSelector/CheckboxSelectorMf.xml"/>
+        </widgetFiles>
+        <files>
+            <file path="CheckboxSelector/widget/"/>
+        </files>
+    </clientModule>
 </package>
