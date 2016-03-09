@@ -10,11 +10,17 @@ require([
 
     return declare("CheckboxSelector.widget.checkboxselectormf", [_checkboxWidget], {
 
-        _loadData: function () {
+        _loadData: function (callback) {
             logger.debug(this.id + "._loadData");
             this._clearValidations();
-            this._execMf(this.datasourcemf, this._contextObj.getGuid(), lang.hitch(this, this._fetchData));
+            this._execMf(this.datasourcemf, this._contextObj.getGuid(), lang.hitch(this, function (objs) {
+                this._fetchData(objs, callback);
+            }));
         }
 
     });
+});
+
+require(["CheckboxSelector/widget/checkboxselectormf"], function () {
+    "use strict";
 });

@@ -22,7 +22,7 @@ define([
 ], function (declare, _WidgetBase, _TemplatedMixin, domMx, dom, domQuery, domProp, domGeom, domClass, domStyle, on, lang, text, array, domConstruct, widgetTemplate) {
     "use strict";
 
-    var _checkbox = declare("CheckboxSelector.widget.checkboxselector", [_WidgetBase, _TemplatedMixin], {
+    return declare("CheckboxSelector.widget.checkboxselector", [_WidgetBase, _TemplatedMixin], {
 
         templateString: widgetTemplate,
 
@@ -44,20 +44,18 @@ define([
             logger.debug(this.id + ".update");
             this._contextObj = obj;
 
-            if (this._contextObj === null) {
-                // No data no show
-                domStyle.set(this.domNode, "visibility", "hidden");
-            } else {
+            if (this._contextObj !== null) {
                 domStyle.set(this.domNode, "visibility", "visible");
                 this._readonly = this._contextObj.isReadonlyAttr(this._referencePath);
 
                 // Subscribe to object updates.
                 this._resetSubscriptions();
-
-                this._loadData();
+                this._loadData(callback);
+            } else {
+                // No data no show
+                domStyle.set(this.domNode, "visibility", "hidden");
+                callback();
             }
-
-            callback();
         },
 
         _setupWidget: function () {
@@ -74,7 +72,6 @@ define([
 
                 //Add the onclick event on the SelectAll checkbox
                 on(this._selectAllBox, "click", lang.hitch(this, function (event) {
-
                     var tbody = domQuery("tbody", this.domNode)[0];
                     //toggle all checkboxes when the row is clicked
                     this._selectAllBoxes(domQuery("input", tbody));
@@ -89,7 +86,6 @@ define([
             if (!this.readOnly && !this._readonly) {
                 on(domQuery("tbody tr", this.domNode), "click", lang.hitch(this, function (event) {
                     if (event.target.tagName.toUpperCase() === "INPUT") {
-
                         //Evaluate if the value of the select all box needs to change
                         this._evaluateSelectAllBox( event.target );
 
@@ -110,7 +106,7 @@ define([
          * Interaction widget methods.
          * ======================
          */
-        _loadData: function () {
+        _loadData: function (callback) {
             logger.debug(this.id + "._loadData");
             this._clearValidations();
 
@@ -130,7 +126,11 @@ define([
                 xpath: xpath,
                 filter: filters,
                 callback: lang.hitch(this, function (objs) {
-                    this._fetchData(objs);
+                    this._fetchData(objs, callback);
+                }),
+                error: lang.hitch(this, function (err) {
+                    console.error(this.id + "_loadData get failed: " + err.toString());
+                    mendix.lang.nullExec(callback);
                 })
             });
         },
@@ -168,7 +168,7 @@ define([
          * Fetching Data & Building widget
          * ======================
          */
-        _buildTemplate: function (rows, headers) {
+        _buildTemplate: function (rows, headers, callback) {
             logger.debug(this.id + "._buildTemplate");
             var tbody = domQuery("tbody", this.domNode)[0],
                 thead = domQuery("thead tr", this.domNode)[0];
@@ -215,39 +215,45 @@ define([
             this._setReferencedBoxes(this._contextObj.getReferences(this.reference.split("/")[0]));
 
             this._setupEvents();
+
+            mendix.lang.nullExec(callback);
         },
 
-        _fetchData: function (objs) {
+        _fetchData: function (objs, callback) {
             logger.debug(this.id + "._fetchData");
             var data = [],
                 finalLength = objs.length * this.displayAttrs.length;
 
-            array.forEach(objs, lang.hitch(this, function (obj) {
-                array.forEach(this.displayAttrs, lang.hitch(this, function (attr, index) {
-                    obj.fetch(attr.displayAttr, lang.hitch(this, function (value) {
-                        if (typeof value === "string") {
-                            value = mxui.dom.escapeString(value);
-                            value = value.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gm, " Warning! Script tags not allowed. ");
-                        }
-                        if (attr.currency !== "None") {
-                            value = this._parseCurrency(value, attr);
-                        }
+            if (objs.length) {
+                array.forEach(objs, lang.hitch(this, function (obj) {
+                    array.forEach(this.displayAttrs, lang.hitch(this, function (attr, index) {
+                        obj.fetch(attr.displayAttr, lang.hitch(this, function (value) {
+                            if (typeof value === "string") {
+                                value = mxui.dom.escapeString(value);
+                                value = value.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gm, " Warning! Script tags not allowed. ");
+                            }
+                            if (attr.currency !== "None") {
+                                value = this._parseCurrency(value, attr);
+                            }
 
-                        data.push({
-                            "obj": obj.getGuid(),
-                            "index": index,
-                            "value": value,
-                            "header": attr.header
-                        });
-                        if (data.length === finalLength) {
-                            this._processData(data);
-                        }
+                            data.push({
+                                "obj": obj.getGuid(),
+                                "index": index,
+                                "value": value,
+                                "header": attr.header
+                            });
+                            if (data.length === finalLength) {
+                                this._processData(data, callback);
+                            }
+                        }));
                     }));
                 }));
-            }));
+            } else {
+                mendix.lang.nullExec(callback);
+            }
         },
 
-        _processData: function (data) {
+        _processData: function (data, callback) {
             logger.debug(this.id + "._processData");
             var rowObjs = [],
                 rows = [],
@@ -280,7 +286,7 @@ define([
                 });
                 rows.push(row);
             });
-            this._buildTemplate(rows, headers);
+            this._buildTemplate(rows, headers, callback);
         },
 
         /**
@@ -353,7 +359,6 @@ define([
                 this._contextObj.removeReferences(this._referencePath, box.value);
             }
         },
-
 
         /**
          * Helper functions
@@ -494,6 +499,8 @@ define([
             this.domNode.appendChild(this._alertdiv);
         }
     });
+});
 
-    return _checkbox;
+require(["CheckboxSelector/widget/checkboxselector"], function () {
+    "use strict";
 });
