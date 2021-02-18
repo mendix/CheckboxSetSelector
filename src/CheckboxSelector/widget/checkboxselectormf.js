@@ -12,10 +12,14 @@ require([
 
         _loadData: function (callback) {
             logger.debug(this.id + "._loadData");
-            this._clearValidations();
-            this._execMf(this.datasourcemf, this._contextObj.getGuid(), lang.hitch(this, function (objs) {
-                this._fetchData(objs, callback);
-            }));
+            if (this._contextObj && this._contextObj.getGuid()) {
+                this._clearValidations();
+                this._execMf(this.datasourcemf, this._contextObj.getGuid(), lang.hitch(this, function(objs) {
+                    this._fetchData(objs, callback);
+                }));
+            } else {
+                if (callback) callback();
+            }
         }
 
     });
