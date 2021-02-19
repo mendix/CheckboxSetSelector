@@ -132,7 +132,7 @@ define([
                     }),
                     error: lang.hitch(this, function(err) {
                         console.error(this.id + "_loadData get failed: " + err.toString());
-                        callback(null);
+                        if (callback) callback();
                     })
                 });
             } else {
