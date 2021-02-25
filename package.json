@@ -28,6 +28,7 @@
     "testProjectFileName": "Test.mpr"
   },
   "scripts": {
+    "build": "grunt build",
     "test": "grunt test"
   }
 }

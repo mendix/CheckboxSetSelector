@@ -44,7 +44,7 @@ define([
             logger.debug(this.id + ".update");
             this._contextObj = obj;
 
-            if (this._contextObj !== null) {
+            if (this._contextObj && this._contextObj.getGuid()) {
                 domStyle.set(this.domNode, "visibility", "visible");
                 this._readonly = this._contextObj.isReadonlyAttr(this._referencePath);
 
@@ -54,7 +54,7 @@ define([
             } else {
                 // No data no show
                 domStyle.set(this.domNode, "visibility", "hidden");
-                callback();
+                if (callback) callback();
             }
         },
 
@@ -108,31 +108,36 @@ define([
          */
         _loadData: function (callback) {
             logger.debug(this.id + "._loadData");
-            this._clearValidations();
 
-            //default fetch
-            var refEntity = this.reference.split("/")[1],
-                filters = {},
-                xpath = "//" + refEntity;
+            if (this._contextObj && this._contextObj.getGuid()) {
+                this._clearValidations();
 
-            filters.sort = [[this.sortAttr, this.sortOrder]];
-            if (this.limit > 0) {
-                filters.amount = this.limit;
+                //default fetch
+                var refEntity = this.reference.split("/")[1],
+                    filters = {},
+                    xpath = "//" + refEntity;
+
+                filters.sort = [[this.sortAttr, this.sortOrder]];
+                if (this.limit > 0) {
+                    filters.amount = this.limit;
+                }
+                if (this.constraint) {
+                    xpath = "//" + refEntity + this.constraint.replace(/\[%CurrentObject%\]/g, this._contextObj.getGuid());
+                }
+                mx.data.get({
+                    xpath: xpath,
+                    filter: filters,
+                    callback: lang.hitch(this, function(objs) {
+                        this._fetchData(objs, callback);
+                    }),
+                    error: lang.hitch(this, function(err) {
+                        console.error(this.id + "_loadData get failed: " + err.toString());
+                        if (callback) callback();
+                    })
+                });
+            } else {
+                if (callback) callback();
             }
-            if (this.constraint) {
-                xpath = "//" + refEntity + this.constraint.replace(/\[%CurrentObject%\]/g, this._contextObj.getGuid());
-            }
-            mx.data.get({
-                xpath: xpath,
-                filter: filters,
-                callback: lang.hitch(this, function (objs) {
-                    this._fetchData(objs, callback);
-                }),
-                error: lang.hitch(this, function (err) {
-                    console.error(this.id + "_loadData get failed: " + err.toString());
-                    mendix.lang.nullExec(callback);
-                })
-            });
         },
 
         _setAsReference: function (guid) {
@@ -170,6 +175,11 @@ define([
          */
         _buildTemplate: function (rows, headers, callback) {
             logger.debug(this.id + "._buildTemplate");
+
+            if (!this._contextObj || !this._contextObj.getGuid()){
+                if (callback) callback();
+            }
+
             var tbody = domQuery("tbody", this.domNode)[0],
                 thead = domQuery("thead tr", this.domNode)[0];
 
@@ -216,7 +226,7 @@ define([
 
             this._setupEvents();
 
-            mendix.lang.nullExec(callback);
+            if (callback) callback();
         },
 
         _fetchData: function (objs, callback) {
@@ -249,7 +259,7 @@ define([
                     }));
                 }));
             } else {
-                mendix.lang.nullExec(callback);
+                if (callback) callback();
             }
         },
 
