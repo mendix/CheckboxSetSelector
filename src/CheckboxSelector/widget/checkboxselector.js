@@ -55,7 +55,7 @@ define([
                 // No data no show
                 domStyle.set(this.domNode, "visibility", "hidden");
                 if(this.displayAttrs.length === 0){
-                    console.error("Checkbox Set Selector: Missing 'Display attributes', please check the Display tab in the widget configuration.")
+                    console.error(this.friendlyId + ": Missing 'Display attributes', please check the Display tab in the widget configuration.");
                 }
                 if (callback) callback();
             }
