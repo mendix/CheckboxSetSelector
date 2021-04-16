@@ -11,7 +11,7 @@ require([
     return declare("CheckboxSelector.widget.checkboxselectormf", [_checkboxWidget], {
 
         _loadData: function (callback) {
-            logger.debug(this.id + "._loadData");
+            console.debug(this.id + "._loadData");
             if (this._contextObj && this._contextObj.getGuid()) {
                 this._clearValidations();
                 this._execMf(this.datasourcemf, this._contextObj.getGuid(), lang.hitch(this, function(objs) {
