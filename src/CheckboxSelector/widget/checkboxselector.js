@@ -34,17 +34,17 @@ define([
         _referencePath: null,
 
         postCreate: function () {
-            logger.debug(this.id + ".postCreate");
+            console.debug(this.id + ".postCreate");
             this._handles = [];
 
             this._setupWidget();
         },
 
         update: function (obj, callback) {
-            logger.debug(this.id + ".update");
+            console.debug(this.id + ".update");
             this._contextObj = obj;
 
-            if (this._contextObj && this._contextObj.getGuid()) {
+            if (this._contextObj && this._contextObj.getGuid() && this.displayAttrs.length > 0) {
                 domStyle.set(this.domNode, "visibility", "visible");
                 this._readonly = this._contextObj.isReadonlyAttr(this._referencePath);
 
@@ -54,12 +54,15 @@ define([
             } else {
                 // No data no show
                 domStyle.set(this.domNode, "visibility", "hidden");
+                if(this.displayAttrs.length === 0){
+                    console.error(this.friendlyId + ": Missing 'Display attributes', please check the Display tab in the widget configuration.");
+                }
                 if (callback) callback();
             }
         },
 
         _setupWidget: function () {
-            logger.debug(this.id + "._setupWidget");
+            console.debug(this.id + "._setupWidget");
             this._referencePath = this.reference.split("/")[0];
             this._firstTh = domQuery(".first-th", this.domNode)[0];
 
@@ -82,7 +85,7 @@ define([
 
         // Attach events to newly created nodes.
         _setupEvents: function () {
-            logger.debug(this.id + "._setupEvents");
+            console.debug(this.id + "._setupEvents");
             if (!this.readOnly && !this._readonly) {
                 on(domQuery("tbody tr", this.domNode), "click", lang.hitch(this, function (event) {
                     if (event.target.tagName.toUpperCase() === "INPUT") {
@@ -107,7 +110,7 @@ define([
          * ======================
          */
         _loadData: function (callback) {
-            logger.debug(this.id + "._loadData");
+            console.debug(this.id + "._loadData");
 
             if (this._contextObj && this._contextObj.getGuid()) {
                 this._clearValidations();
@@ -141,12 +144,12 @@ define([
         },
 
         _setAsReference: function (guid) {
-            logger.debug(this.id + "._setAsReference");
+            console.debug(this.id + "._setAsReference");
             this._contextObj.addReferences(this._referencePath, [guid]);
         },
 
         _execMf: function (mf, guid, cb) {
-            logger.debug(this.id + "._execMf");
+            console.debug(this.id + "._execMf");
             if (mf && guid) {
                 mx.data.action({
                     params: {
@@ -174,7 +177,7 @@ define([
          * ======================
          */
         _buildTemplate: function (rows, headers, callback) {
-            logger.debug(this.id + "._buildTemplate");
+            console.debug(this.id + "._buildTemplate");
 
             if (!this._contextObj || !this._contextObj.getGuid()){
                 if (callback) callback();
@@ -230,7 +233,7 @@ define([
         },
 
         _fetchData: function (objs, callback) {
-            logger.debug(this.id + "._fetchData");
+            console.debug(this.id + "._fetchData");
             var data = [],
                 finalLength = objs.length * this.displayAttrs.length;
 
@@ -264,7 +267,7 @@ define([
         },
 
         _processData: function (data, callback) {
-            logger.debug(this.id + "._processData");
+            console.debug(this.id + "._processData");
             var rowObjs = [],
                 rows = [],
                 headers = [];
@@ -304,7 +307,7 @@ define([
          * ======================
          */
         _toggleCheckboxes: function (boxes) {
-            logger.debug(this.id + "._toggleCheckboxes");
+            console.debug(this.id + "._toggleCheckboxes");
             array.forEach(boxes, lang.hitch(this, function(node) {
                 this._toggleCheckbox(node);
             }));
@@ -313,7 +316,7 @@ define([
         },
 
         _toggleCheckbox: function (box) {
-            logger.debug(this.id + "._toggleCheckbox");
+            console.debug(this.id + "._toggleCheckbox");
             if (box.checked) {
                 box.checked = false;
                 this._evaluateSelectAllBox( box );
@@ -326,7 +329,7 @@ define([
          * Evaluate if the value of the select all box needs to change
          */
         _evaluateSelectAllBox: function ( box ) {
-            logger.debug(this.id + "._evaluateSelectAllBox");
+            console.debug(this.id + "._evaluateSelectAllBox");
             if( box.checked === false ) {
                 if (this.addSelectAll && this._selectAllBox.checked)
                     this._selectAllBox.checked = false;
@@ -334,14 +337,14 @@ define([
         },
 
         _setDisabled: function (boxes) {
-            logger.debug(this.id + "._setDisabled");
+            console.debug(this.id + "._setDisabled");
             array.forEach(boxes, function (box) {
                 box.disabled = true;
             });
         },
 
         _selectAllBoxes: function (boxes) {
-            logger.debug(this.id + "._selectAllBoxes");
+            console.debug(this.id + "._selectAllBoxes");
             array.forEach(boxes, lang.hitch(this, function (box) {
                 if (this._selectAllBox.checked) {
                     box.checked = true;
@@ -353,7 +356,7 @@ define([
         },
 
         _setReferences: function (boxes) {
-            logger.debug(this.id + "._setReferences");
+            console.debug(this.id + "._setReferences");
             boxes.forEach( lang.hitch(this, function (box) {
                 this._setReference(box);
             }));
@@ -362,7 +365,7 @@ define([
         },
 
         _setReference : function (box) {
-            logger.debug(this.id + "._setReference");
+            console.debug(this.id + "._setReference");
             if (box.checked) {
                 this._setAsReference(box.value);
             } else {
@@ -376,7 +379,7 @@ define([
          */
 
         _setReferencedBoxes: function (guids) {
-            logger.debug(this.id + "._setReferencedBoxes");
+            console.debug(this.id + "._setReferencedBoxes");
             var inputNodes = domQuery("input[value]", this.domNode);
 
             array.forEach(inputNodes, lang.hitch(this, function(inputNode) {
@@ -391,7 +394,7 @@ define([
         },
 
         _parseCurrency: function (value, attr) {
-            logger.debug(this.id + "._parseCurrency");
+            console.debug(this.id + "._parseCurrency");
             var currency = value;
             switch (attr.currency) {
             case "Euro":
@@ -429,7 +432,7 @@ define([
         },
 
         _resetSubscriptions: function () {
-            logger.debug(this.id + "._resetSubscriptions");
+            console.debug(this.id + "._resetSubscriptions");
             var entHandle = null,
                 objHandle = null,
                 attrHandle = null,
@@ -477,7 +480,7 @@ define([
         },
 
         _handleValidation: function (validations) {
-            logger.debug(this.id + "._handleValidation");
+            console.debug(this.id + "._handleValidation");
 
             this._clearValidations();
 
@@ -495,12 +498,12 @@ define([
         },
 
         _clearValidations: function () {
-            logger.debug(this.id + "._clearValidations");
+            console.debug(this.id + "._clearValidations");
             domConstruct.destroy(this._alertdiv);
         },
 
         _addValidation: function (msg) {
-            logger.debug(this.id + "._addValidation");
+            console.debug(this.id + "._addValidation");
             this._alertdiv = domConstruct.create("div", {
                 class: "alert alert-danger",
                 innerHTML: msg

@@ -44,12 +44,12 @@
         </property>
         <property key="readOnly" type="boolean" defaultValue="false">
             <caption>Read only</caption>
-            <category>Appearance</category>
+            <category>Display</category>
             <description>Setting to set the widget to read only.</description>
         </property>
         <property key="displayAttrs" type="object" isList="true" required="false">
             <caption>Display attributes</caption>
-            <category>Appearance</category>
+            <category>Display</category>
             <description>The object order equals the display order.</description>
             <properties>
                 <property key="header" type="translatableString">
